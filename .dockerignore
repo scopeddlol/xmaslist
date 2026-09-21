@@ -1,0 +1,10 @@
+node_modules
+.next
+.git
+data
+*.db
+README.md
+Dockerfile
+docker-compose.yml
+tests
+.github

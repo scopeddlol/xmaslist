@@ -1,0 +1,16 @@
+services:
+    xmaslist:
+        build: .
+        image: xmaslist
+        container_name: xmaslist
+        restart: unless-stopped
+        ports:
+            - "${PORT:-3000}:3000"
+        volumes:
+            - xmaslist-data:/data
+        environment:
+            # Where the SQLite file lives inside the container.
+            DATABASE_PATH: /data/xmaslist.db
+
+volumes:
+    xmaslist-data:

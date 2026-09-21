@@ -6,7 +6,7 @@ without anyone buying the same thing twice.
 One Docker container, one SQLite file, no accounts and no passwords.
 
 ```bash
-docker compose up -d --build
+docker run -d -p 3000:3000 -v xmaslist-data:/data ghcr.io/scopeddlol/xmaslist:latest
 # → http://localhost:3000
 ```
 
@@ -28,21 +28,56 @@ docker compose up -d --build
 
 ## Running it
 
-### Docker Compose (recommended)
+### From the published image (recommended)
+
+GitHub Actions builds a multi-arch image (`linux/amd64` and `linux/arm64`, so a Raspberry Pi
+works too) and publishes it to GitHub Container Registry on every push to `main` and every
+`v*.*.*` tag. [`docker-compose.ghcr.yml`](./docker-compose.ghcr.yml) is the only file you need:
+
+```bash
+curl -O https://raw.githubusercontent.com/scopeddlol/xmaslist/main/docker-compose.ghcr.yml
+docker compose -f docker-compose.ghcr.yml up -d
+```
+
+Or without Compose:
+
+```bash
+docker run -d --name xmaslist -p 3000:3000 -v xmaslist-data:/data \
+    ghcr.io/scopeddlol/xmaslist:latest
+```
+
+Updating is a pull and an up:
+
+```bash
+docker compose -f docker-compose.ghcr.yml pull && docker compose -f docker-compose.ghcr.yml up -d
+```
+
+Tags published: `latest` (the tip of `main`), `v1.2.3`, `1.2`, `1`, the branch name, and
+`sha-<short>` if you want to pin exactly. Set `XMASLIST_TAG` to pick one:
+`XMASLIST_TAG=v1.0.0 docker compose -f docker-compose.ghcr.yml up -d`.
+
+> **First publish:** new GHCR packages are private. After the first successful run, open the
+> package on GitHub → *Package settings* → *Change visibility* → **Public**, otherwise anyone
+> pulling it (including you, on another machine) needs `docker login ghcr.io` first.
+
+### Building from source
+
+[`docker-compose.yml`](./docker-compose.yml) builds the image from this checkout instead of
+pulling it:
 
 ```bash
 docker compose up -d --build
 ```
 
-The list lives in the `xmaslist-data` volume, so it survives rebuilds. Change the published port
-with `PORT=8080 docker compose up -d`.
-
-### Docker without Compose
+Or by hand:
 
 ```bash
 docker build -t xmaslist .
 docker run -d --name xmaslist -p 3000:3000 -v xmaslist-data:/data xmaslist
 ```
+
+Either way the list lives in the `xmaslist-data` volume, so it survives rebuilds. Change the
+published port with `PORT=8080 docker compose up -d`.
 
 ### Local development
 
@@ -76,6 +111,24 @@ Everything is in one SQLite file. To take a copy:
 ```bash
 docker run --rm -v xmaslist-data:/data -v "$PWD:/backup" busybox \
     sh -c "cp /data/xmaslist.db* /backup/"
+```
+
+## Continuous integration
+
+[`.github/workflows/docker-publish.yml`](./.github/workflows/docker-publish.yml) runs on pushes to
+`main`, on `v*.*.*` tags, on pull requests and on demand:
+
+1. **check** — `npm ci`, `npm run typecheck`, `npm run build`. Fails fast without touching Docker.
+2. **image** — builds for `linux/amd64` and `linux/arm64` with Buildx, layer-caching through GitHub
+   Actions cache, and pushes to GHCR with a provenance attestation.
+
+Pull requests build the image but do not push it, so a fork's PR cannot publish. Nothing to
+configure: it authenticates with the automatic `GITHUB_TOKEN`.
+
+To cut a release:
+
+```bash
+git tag v1.0.0 && git push origin v1.0.0
 ```
 
 ## Markdown import format

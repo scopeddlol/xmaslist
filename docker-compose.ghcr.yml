@@ -1,0 +1,26 @@
+# Run the prebuilt image from GitHub Container Registry — no source checkout,
+# no build step. Only this file is needed:
+#
+#   docker compose -f docker-compose.ghcr.yml up -d
+#
+# To update later:
+#
+#   docker compose -f docker-compose.ghcr.yml pull
+#   docker compose -f docker-compose.ghcr.yml up -d
+#
+# Pin a release instead of `latest` by setting XMASLIST_TAG, e.g.
+# `XMASLIST_TAG=v1.0.0 docker compose -f docker-compose.ghcr.yml up -d`.
+services:
+    xmaslist:
+        image: ghcr.io/scopeddlol/xmaslist:${XMASLIST_TAG:-latest}
+        container_name: xmaslist
+        restart: unless-stopped
+        ports:
+            - "${PORT:-3000}:3000"
+        volumes:
+            - xmaslist-data:/data
+        environment:
+            DATABASE_PATH: /data/xmaslist.db
+
+volumes:
+    xmaslist-data:

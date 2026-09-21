@@ -23,6 +23,9 @@ RUN npm run build
 FROM node:22-bookworm-slim AS runner
 WORKDIR /app
 
+LABEL org.opencontainers.image.source="https://github.com/scopeddlol/xmaslist" \
+      org.opencontainers.image.description="A sleek, self-hosted Christmas wishlist."
+
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
     PORT=3000 \

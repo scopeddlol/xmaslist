@@ -1,0 +1,31 @@
+{
+    "name": "xmaslist",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start",
+        "typecheck": "tsc --noEmit",
+        "test:e2e": "node tests/e2e.mjs"
+    },
+    "dependencies": {
+        "@untitledui/icons": "^0.0.22",
+        "better-sqlite3": "^13.0.3",
+        "next": "^16.3.5",
+        "react": "^19.3.0",
+        "react-aria-components": "^1.21.1",
+        "react-dom": "^19.3.0",
+        "tailwind-merge": "^3.3.1"
+    },
+    "devDependencies": {
+        "@tailwindcss/postcss": "^4.3.3",
+        "@types/better-sqlite3": "^7.6.13",
+        "@types/node": "^22.10.0",
+        "@types/react": "^19.3.0",
+        "@types/react-dom": "^19.3.0",
+        "tailwindcss": "^4.3.3",
+        "typescript": "^5.7.0"
+    },
+    "description": "A sleek, self-hosted Christmas wishlist that runs in one Docker container."
+}

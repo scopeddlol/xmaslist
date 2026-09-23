@@ -1,6 +1,6 @@
 /**
- * End-to-end smoke test: claiming, link lookup, editing, reordering and
- * markdown import, driven through a real browser.
+ * End-to-end smoke test: link lookup, editing, reordering and markdown
+ * import, driven through a real browser.
  *
  *   npm run build && npm start          # in one terminal
  *   npx playwright@latest install chromium
@@ -120,12 +120,10 @@ try {
     if (!(await page.getByText("Tin of shortbread").first().isVisible())) throw new Error("direct list URL failed");
     step("direct /l/<slug> link renders that list");
 
-    await page.getByRole("button", { name: /I'll get this/ }).first().click();
-    await page.getByRole("textbox", { name: "Your name" }).fill("Uncle Ray");
-    await page.getByRole("button", { name: /I'll get this/ }).last().click();
-    await page.waitForTimeout(800);
-    if (!(await page.getByText("Uncle Ray is getting this").first().isVisible())) throw new Error("claim was not recorded");
-    step("claiming a gift works");
+    const shopLink = page.getByRole("link", { name: /shop\.example\.com/ }).first();
+    if (!(await shopLink.isVisible())) throw new Error("shopper view is missing the item link");
+    if (await shopLink.getAttribute("target") !== "_blank") throw new Error("item link should open in a new tab");
+    step("shopper view links out to the item");
 
     if (failures.length) throw new Error(`console or page errors:\n${failures.join("\n")}`);
     step("no console or page errors");

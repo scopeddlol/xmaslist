@@ -40,8 +40,6 @@ function open(): Database.Database {
             notes        TEXT,
             quantity     INTEGER NOT NULL DEFAULT 1,
             priority     TEXT NOT NULL DEFAULT 'normal',
-            claimed_by   TEXT,
-            claimed_at   TEXT,
             position     INTEGER NOT NULL DEFAULT 0,
             created_at   TEXT NOT NULL DEFAULT (datetime('now')),
             updated_at   TEXT NOT NULL DEFAULT (datetime('now'))
@@ -50,7 +48,28 @@ function open(): Database.Database {
         CREATE INDEX IF NOT EXISTS idx_items_list ON items(list_id, position);
     `);
 
+    dropClaimColumns(db);
+
     return db;
+}
+
+/**
+ * Gift claiming was removed. Older databases still carry the columns and the
+ * names people entered, so drop them and vacuum so the data leaves the file.
+ */
+function dropClaimColumns(db: Database.Database): void {
+    const columns = db.prepare("PRAGMA table_info(items)").all() as { name: string }[];
+    const stale = ["claimed_by", "claimed_at"].filter((name) => columns.some((column) => column.name === name));
+
+    if (!stale.length) return;
+
+    // secure_delete zeroes freed pages, so the names do not survive in slack
+    // space; the checkpoint then folds the rewritten file out of the WAL.
+    db.pragma("secure_delete = ON");
+    for (const name of stale) db.exec(`ALTER TABLE items DROP COLUMN ${name}`);
+    db.exec("VACUUM");
+    db.pragma("wal_checkpoint(TRUNCATE)");
+    db.pragma("secure_delete = OFF");
 }
 
 export const db: Database.Database = globalThis.__xmasDb ?? (globalThis.__xmasDb = open());

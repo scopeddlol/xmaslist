@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 type Context = { params: Promise<{ id: string }> };
 
-const FIELDS = ["title", "url", "image_url", "price", "currency", "notes", "quantity", "priority", "claimed_by"] as const;
+const FIELDS = ["title", "url", "image_url", "price", "currency", "notes", "quantity", "priority"] as const;
 
 export async function PATCH(request: Request, { params }: Context) {
     const { id } = await params;
@@ -40,12 +40,6 @@ export async function PATCH(request: Request, { params }: Context) {
             case "currency":
                 updates.currency = String(value ?? "USD").slice(0, 8).toUpperCase();
                 break;
-            case "claimed_by": {
-                const claimed = value === null ? null : String(value).trim().slice(0, 60) || null;
-                updates.claimed_by = claimed;
-                updates.claimed_at = claimed ? new Date().toISOString() : null;
-                break;
-            }
             default:
                 updates[field] = value === null || value === "" ? null : String(value).slice(0, 2000);
         }

@@ -1,15 +1,6 @@
 "use client";
 
-import {
-    ArrowDown,
-    ArrowUp,
-    CheckCircle,
-    Edit02,
-    Gift01,
-    LinkExternal02,
-    Star01,
-    Trash01,
-} from "@untitledui/icons";
+import { ArrowDown, ArrowUp, Edit02, Gift01, LinkExternal02, Star01, Trash01 } from "@untitledui/icons";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cx, formatPrice, hostnameOf } from "@/lib/cx";
@@ -20,24 +11,20 @@ export interface GiftCardProps {
     editMode: boolean;
     isFirst: boolean;
     isLast: boolean;
-    onClaim: (item: GiftItem) => void;
-    onUnclaim: (item: GiftItem) => void;
     onEdit: (item: GiftItem) => void;
     onDelete: (item: GiftItem) => void;
     onMove: (item: GiftItem, direction: -1 | 1) => void;
 }
 
-export function GiftCard({ item, editMode, isFirst, isLast, onClaim, onUnclaim, onEdit, onDelete, onMove }: GiftCardProps) {
+export function GiftCard({ item, editMode, isFirst, isLast, onEdit, onDelete, onMove }: GiftCardProps) {
     const price = formatPrice(item.price, item.currency);
     const host = hostnameOf(item.url);
-    const claimed = Boolean(item.claimed_by);
 
     return (
         <article
             className={cx(
                 "group relative flex flex-col overflow-hidden rounded-2xl border border-secondary bg-primary shadow-xs transition duration-200",
                 "hover:-translate-y-0.5 hover:border-primary hover:shadow-lg",
-                claimed && !editMode && "opacity-75",
             )}
         >
             <div className="relative aspect-[4/3] w-full overflow-hidden bg-secondary">
@@ -47,10 +34,7 @@ export function GiftCard({ item, editMode, isFirst, isLast, onClaim, onUnclaim, 
                         src={item.image_url}
                         alt=""
                         loading="lazy"
-                        className={cx(
-                            "size-full object-cover transition duration-300 group-hover:scale-[1.03]",
-                            claimed && "grayscale",
-                        )}
+                        className="size-full object-cover transition duration-300 group-hover:scale-[1.03]"
                         onError={(event) => {
                             event.currentTarget.style.display = "none";
                         }}
@@ -69,14 +53,6 @@ export function GiftCard({ item, editMode, isFirst, isLast, onClaim, onUnclaim, 
                     )}
                     {item.quantity > 1 && <Badge className="backdrop-blur">×{item.quantity}</Badge>}
                 </div>
-
-                {claimed && (
-                    <div className="absolute top-3 right-3">
-                        <Badge color="success" className="backdrop-blur">
-                            <CheckCircle className="size-3" /> {item.claimed_by}
-                        </Badge>
-                    </div>
-                )}
             </div>
 
             <div className="flex flex-1 flex-col gap-1.5 p-3 sm:gap-2 sm:p-4">
@@ -89,21 +65,21 @@ export function GiftCard({ item, editMode, isFirst, isLast, onClaim, onUnclaim, 
 
                 {item.notes && <p className="line-clamp-2 text-xs text-tertiary sm:text-sm">{item.notes}</p>}
 
-                {host && (
-                    <a
-                        href={item.url ?? undefined}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex w-fit max-w-full items-center gap-1 text-xs font-medium text-brand hover:underline sm:text-sm"
-                    >
-                        <span className="truncate">{host}</span>
-                        <LinkExternal02 className="size-3.5 shrink-0" />
-                    </a>
-                )}
+                {editMode ? (
+                    <>
+                        {host && (
+                            <a
+                                href={item.url ?? undefined}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex w-fit max-w-full items-center gap-1 text-xs font-medium text-brand hover:underline sm:text-sm"
+                            >
+                                <span className="truncate">{host}</span>
+                                <LinkExternal02 className="size-3.5 shrink-0" />
+                            </a>
+                        )}
 
-                <div className="mt-auto flex flex-wrap items-center gap-2 pt-3">
-                    {editMode ? (
-                        <>
+                        <div className="mt-auto flex flex-wrap items-center gap-2 pt-3">
                             <Button size="sm" variant="secondary" onPress={() => onEdit(item)}>
                                 <Edit02 className="size-4" /> Edit
                             </Button>
@@ -137,26 +113,25 @@ export function GiftCard({ item, editMode, isFirst, isLast, onClaim, onUnclaim, 
                             >
                                 <Trash01 className="size-4" />
                             </Button>
-                        </>
-                    ) : claimed ? (
-                        <div className="flex w-full flex-wrap items-center justify-between gap-2">
-                            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-success-700 dark:text-success-300">
-                                <CheckCircle className="size-3.5" /> {item.claimed_by} is getting this
-                            </span>
-                            <button
-                                type="button"
-                                onClick={() => onUnclaim(item)}
-                                className="cursor-pointer text-xs font-semibold text-tertiary underline-offset-2 hover:underline"
-                            >
-                                Undo
-                            </button>
                         </div>
-                    ) : (
-                        <Button size="sm" variant="ghost-brand" className="w-full" onPress={() => onClaim(item)}>
-                            <CheckCircle className="size-4" /> I&apos;ll get this
-                        </Button>
-                    )}
-                </div>
+                    </>
+                ) : (
+                    host && (
+                        <a
+                            href={item.url ?? undefined}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={cx(
+                                "mt-auto flex h-9 items-center justify-center gap-1.5 rounded-lg px-3 text-sm font-semibold transition",
+                                "bg-brand-subtle text-brand hover:brightness-95 dark:hover:brightness-125",
+                                "outline-none focus-visible:ring-4 focus-visible:ring-[var(--ring-brand)]",
+                            )}
+                        >
+                            <span className="truncate">{host}</span>
+                            <LinkExternal02 className="size-3.5 shrink-0" />
+                        </a>
+                    )
+                )}
             </div>
         </article>
     );

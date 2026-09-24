@@ -11,8 +11,6 @@ export interface GiftItem {
     notes: string | null;
     quantity: number;
     priority: Priority;
-    claimed_by: string | null;
-    claimed_at: string | null;
     position: number;
     created_at: string;
     updated_at: string;

@@ -1,7 +1,7 @@
 # xmaslist
 
-A sleek, self-hostable Christmas wishlist. Share one link, and everyone knows what to buy —
-without anyone buying the same thing twice.
+A sleek, self-hostable Christmas wishlist. Share one link, and whoever is buying knows exactly
+what to get — names, pictures, prices and the sizes you keep forgetting to mention.
 
 One Docker container, one SQLite file, no accounts and no passwords.
 
@@ -12,9 +12,9 @@ docker run -d -p 3000:3000 -v xmaslist-data:/data ghcr.io/scopeddlol/xmaslist:la
 
 ## What it does
 
-- **Shopper's view by default.** Opening the site shows the list as a guest sees it: browse the
-  gifts, and tap *I'll get this* to claim one so nobody doubles up. The pencil in the top right
-  switches to editor mode.
+- **Shopper's view by default.** Opening the site shows the list as a guest sees it: a clean
+  grid of gifts, each linking straight out to where it can be bought. Nothing about editing is
+  in the way — the pencil in the top right switches to editor mode when you need it.
 - **Multiple named lists.** One per person, or one per occasion. Each gets its own shareable URL
   (`/l/ellie`), and the tab bar switches between them.
 - **Paste a link, get a gift.** The server fetches the page and pulls out the name, image and
@@ -88,7 +88,7 @@ npm run typecheck
 ```
 
 There is a browser smoke test covering the whole flow — creating a list, pulling details from a
-link, adding and reordering gifts, importing markdown and claiming a gift. It drives a running
+link, adding and reordering gifts and importing markdown. It drives a running
 server and serves its own fake shop page, so nothing external is needed:
 
 ```bash
@@ -171,7 +171,7 @@ traced dependencies — no `npm install` at boot.
 
 ## A note on trust
 
-There are no accounts by design: anyone with the link can view, claim and edit. That is the point
+There are no accounts by design: anyone with the link can view and edit. That is the point
 for a family list on a home network or behind a reverse proxy — but do not put it on the open
 internet with anything you would mind a stranger changing. If you need it public, put it behind
 your proxy's basic auth or a VPN.
